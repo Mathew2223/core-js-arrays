@@ -44,13 +44,11 @@ function getIntervalArray(start, end) {
  */
 function sumArrays(arr1, arr2) {
   const maxLength = Math.max(arr1.length, arr2.length);
-  const res = [];
-  for (let i = 0; i < maxLength; i += 1) {
-    const value1 = i < arr1.length ? arr1[i] : 0;
-    const value2 = i < arr2.length ? arr2[i] : 0;
-    res.push(value1 + value2);
-  }
-  return res;
+  return Array.from({ length: maxLength }, (_, index) => {
+    const value1 = arr1[index] || 0;
+    const value2 = arr2[index] || 0;
+    return value1 + value2;
+  });
 }
 
 /**
@@ -84,13 +82,9 @@ function findElement(arr, value) {
  *    findAllOccurrences([ true, 0, 1, 'true' ], true) => 1
  */
 function findAllOccurrences(arr, item) {
-  let noFake = 0;
-  arr.forEach((value) => {
-    if (value === item) {
-      noFake += 1;
-    }
+  return arr.reduce((count, index) => {
+    return index === item ? count + 1 : count;
   }, 0);
-  return noFake;
 }
 
 /**
@@ -537,8 +531,14 @@ function findLongestIncreasingSubsequence(nums) {
  *  propagateItemsByPositionIndex([ 'a', 'b', 'c', null ]) => [ 'a', 'b', 'b', 'c', 'c', 'c',  null, null, null, null ]
  *  propagateItemsByPositionIndex([ 1,2,3,4,5 ]) => [ 1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5 ]
  */
-function propagateItemsByPositionIndex(/* arr */) {
-  throw new Error('Not implemented');
+function propagateItemsByPositionIndex(arr) {
+  const res = [];
+  arr.forEach((item, index) => {
+    for (let i = 0; i <= index; i += 1) {
+      res.push(item);
+    }
+  });
+  return res;
 }
 
 /**
