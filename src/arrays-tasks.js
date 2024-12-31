@@ -318,8 +318,8 @@ function flattenArray(nestedArray) {
  *   selectMany([[1, 2], [3, 4], [5, 6]], (x) => x) =>   [ 1, 2, 3, 4, 5, 6 ]
  *   selectMany(['one','two','three'], (x) => x.split('')) =>   ['o','n','e','t','w','o','t','h','r','e','e']
  */
-function selectMany(/* arr, childrenSelector */) {
-  throw new Error('Not implemented');
+function selectMany(arr, childrenSelector) {
+  return arr.flatMap(childrenSelector);
 }
 
 /**
@@ -335,8 +335,9 @@ function selectMany(/* arr, childrenSelector */) {
  *   calculateBalance([ [ 10, 8 ], [ 1, 5 ] ])  => (10 - 8) + (1 - 5) = 2 + -4 = -2
  *   calculateBalance([]) => 0
  */
-function calculateBalance(/* arr */) {
-  throw new Error('Not implemented');
+function calculateBalance(arr) {
+  if (arr.length === 0) return 0;
+  return arr.reduce((total, nums) => total + (nums[0] - nums[1]), 0);
 }
 
 /**
@@ -352,11 +353,12 @@ function calculateBalance(/* arr */) {
  *    createChunks([10, 20, 30, 40, 50], 1) => [[10], [20], [30], [40], [50]]
  */
 function createChunks(arr, chunkSize) {
-  const res = [];
-  for (let i = 0; i < arr.length; i += chunkSize) {
-    res.push(arr.slice(i, i + chunkSize));
-  }
-  return res;
+  return arr.reduce((items, _, index) => {
+    if (index % chunkSize === 0) {
+      items.push(arr.slice(index, index + chunkSize));
+    }
+    return items;
+  }, []);
 }
 /**
  * Generates an array of odd numbers of the specified length.
@@ -370,8 +372,8 @@ function createChunks(arr, chunkSize) {
  *    generateOdds(2) => [ 1, 3 ]
  *    generateOdds(5) => [ 1, 3, 5, 7, 9 ]
  */
-function generateOdds(/* len */) {
-  throw new Error('Not implemented');
+function generateOdds(len) {
+  return Array.from({ length: len }, (_, i) => i * 2 + 1);
 }
 
 /**
@@ -387,16 +389,12 @@ function generateOdds(/* len */) {
  *   getElementByIndices([[[ 1, 2, 3]]], [ 0, 0, 1 ]) => 2        (arr[0][0][1])
  */
 function getElementByIndices(arr, indices) {
-  let elem = arr;
-  for (let i = 0; i < indices.length; i += 1) {
-    const index = indices[i];
-    if (Array.isArray(elem) && index < elem.length) {
-      elem = elem[index];
-    } else {
-      return undefined;
+  return indices.reduce((elem, i) => {
+    if (Array.isArray(elem) && i < elem.length) {
+      return elem[i];
     }
-  }
-  return elem;
+    return undefined;
+  }, arr);
 }
 
 /**
@@ -411,8 +409,8 @@ function getElementByIndices(arr, indices) {
  *  getFalsyValuesCount([ -1, 'false', null, 0 ]) => 2
  *  getFalsyValuesCount([ null, undefined, NaN, false, 0, '' ]) => 6
  */
-function getFalsyValuesCount(/* arr */) {
-  throw new Error('Not implemented');
+function getFalsyValuesCount(arr) {
+  return arr.filter((item) => !item).length;
 }
 
 /**
@@ -433,8 +431,10 @@ function getFalsyValuesCount(/* arr */) {
  *                              [0,0,0,1,0],
  *                              [0,0,0,0,1]]
  */
-function getIdentityMatrix(/* n */) {
-  throw new Error('Not implemented');
+function getIdentityMatrix(n) {
+  return Array.from({ length: n }, (rowIndex) =>
+    Array.from({ length: n }, (colIndex) => (rowIndex === colIndex ? 1 : 0))
+  );
 }
 
 /**
@@ -449,13 +449,9 @@ function getIdentityMatrix(/* n */) {
  *    getIndicesOfOddNumbers([11, 22, 33, 44, 55]) => [0, 2, 4]
  */
 function getIndicesOfOddNumbers(numbers) {
-  const res = [];
-  for (let i = 0; i < numbers.length; i += 1) {
-    if (numbers[i] % 2 !== 0) {
-      res.push(i);
-    }
-  }
-  return res;
+  return numbers
+    .map((num, i) => (num % 2 !== 0 ? i : -1))
+    .filter((i) => i !== -1);
 }
 
 /**
@@ -530,15 +526,19 @@ function findCommonElements(arr1, arr2) {
  */
 function findLongestIncreasingSubsequence(nums) {
   if (nums.length === 0) return 0;
-  const newArr = new Array(nums.length).fill(1);
-  for (let i = 1; i < nums.length; i += 1) {
-    for (let j = 0; j < i; j += 1) {
-      if (nums[i] > nums[j]) {
-        newArr[i] = Math.max(newArr[i], newArr[j] + 1);
-      }
+  let maxLen = 1;
+  let currlLen = 1;
+  let i = 0;
+  while (i < nums.length) {
+    if (nums[i] > nums[i - 1]) {
+      currlLen += 1;
+    } else {
+      maxLen = Math.max(maxLen, currlLen);
+      currlLen = 1;
     }
+    i += 1;
   }
-  return Math.max(...newArr);
+  return Math.max(maxLen, currlLen);
 }
 
 /**
