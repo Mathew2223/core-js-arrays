@@ -283,8 +283,11 @@ function distinct(arr) {
  *    createNDimensionalArray(4, 2) => [[[[0, 0], [0, 0]], [[0, 0], [0, 0]]], [[[0, 0], [0, 0]], [[0, 0], [0, 0]]]]
  *    createNDimensionalArray(1, 1) => [0]
  */
-function createNDimensionalArray(/* n, size */) {
-  throw new Error('Not implemented');
+function createNDimensionalArray(n, size) {
+  if (n === 1) return new Array(size).fill(0);
+  return new Array(size)
+    .fill(null)
+    .map(() => createNDimensionalArray(n - 1, size));
 }
 
 /**
@@ -348,10 +351,13 @@ function calculateBalance(/* arr */) {
  *    createChunks(['a', 'b', 'c', 'd', 'e'], 2) => [['a', 'b'], ['c', 'd'], ['e']]
  *    createChunks([10, 20, 30, 40, 50], 1) => [[10], [20], [30], [40], [50]]
  */
-function createChunks(/* arr, chunkSize */) {
-  throw new Error('Not implemented');
+function createChunks(arr, chunkSize) {
+  const res = [];
+  for (let i = 0; i < arr.length; i += chunkSize) {
+    res.push(arr.slice(i, i + chunkSize));
+  }
+  return res;
 }
-
 /**
  * Generates an array of odd numbers of the specified length.
  *
@@ -380,8 +386,17 @@ function generateOdds(/* len */) {
  *   getElementByIndices(['one','two','three'], [2]) => 'three'  (arr[2])
  *   getElementByIndices([[[ 1, 2, 3]]], [ 0, 0, 1 ]) => 2        (arr[0][0][1])
  */
-function getElementByIndices(/* arr, indices */) {
-  throw new Error('Not implemented');
+function getElementByIndices(arr, indices) {
+  let elem = arr;
+  for (let i = 0; i < indices.length; i += 1) {
+    const index = indices[i];
+    if (Array.isArray(elem) && index < elem.length) {
+      elem = elem[index];
+    } else {
+      return undefined;
+    }
+  }
+  return elem;
 }
 
 /**
@@ -503,18 +518,16 @@ function findCommonElements(arr1, arr2) {
  *    findLongestIncreasingSubsequence([50, 3, 10, 7, 40, 80]) => longest is [7, 40, 80] => 3
  */
 function findLongestIncreasingSubsequence(nums) {
-  let arr = [];
-  let longestArr = [];
-  nums.forEach((item) => {
-    if (item > arr[item]) {
-      arr.push(item);
+  if (nums.length === 0) return 0;
+  const newArr = new Array(nums.length).fill(1);
+  for (let i = 1; i < nums.length; i += 1) {
+    for (let j = 0; j < i; j += 1) {
+      if (nums[i] > nums[j]) {
+        newArr[i] = Math.max(newArr[i], newArr[j] + 1);
+      }
     }
-    if (item < arr[item]) {
-      longestArr = arr;
-      arr = [];
-    }
-  });
-  return longestArr;
+  }
+  return Math.max(...newArr);
 }
 
 /**
