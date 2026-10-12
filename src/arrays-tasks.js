@@ -432,20 +432,9 @@ function getFalsyValuesCount(arr) {
  *                              [0,0,0,0,1]]
  */
 function getIdentityMatrix(n) {
-  const result = [];
-
-  for (let i = 0; i < n; i += 1) {
-    const row = [];
-    for (let j = 0; j < n; j += 1) {
-      if (i === j) {
-        row[j] = 1;
-      } else {
-        row[j] = 0;
-      }
-    }
-    result[i] = row;
-  }
-  return result;
+  return Array.from({ length: n }, (row, i) =>
+    Array.from({ length: n }, (col, j) => (i === j ? 1 : 0))
+  );
 }
 
 /**
@@ -537,19 +526,20 @@ function findCommonElements(arr1, arr2) {
  */
 function findLongestIncreasingSubsequence(nums) {
   if (nums.length === 0) return 0;
-  let maxLen = 1;
-  let currlLen = 1;
-  let i = 0;
-  while (i < nums.length) {
-    if (nums[i] > nums[i - 1]) {
-      currlLen += 1;
-    } else {
-      maxLen = Math.max(maxLen, currlLen);
-      currlLen = 1;
-    }
-    i += 1;
-  }
-  return Math.max(maxLen, currlLen);
+  const result = nums.reduce(
+    (acc, num, index) => {
+      if (index === 0) {
+        return { maxLen: 1, currLen: 1 };
+      }
+
+      const newCurrLen = num > nums[index - 1] ? acc.currLen + 1 : 1;
+      const newMaxLen = Math.max(acc.maxLen, newCurrLen);
+
+      return { maxLen: newMaxLen, currLen: newCurrLen };
+    },
+    { maxLen: 1, currLen: 1 }
+  );
+  return result.maxLen;
 }
 
 /**
@@ -567,13 +557,9 @@ function findLongestIncreasingSubsequence(nums) {
  *  propagateItemsByPositionIndex([ 1,2,3,4,5 ]) => [ 1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5 ]
  */
 function propagateItemsByPositionIndex(arr) {
-  const res = [];
-  arr.forEach((item, index) => {
-    for (let i = 0; i <= index; i += 1) {
-      res.push(item);
-    }
-  });
-  return res;
+  return arr.reduce((acc, item, index) => {
+    return acc.concat(Array.from({ length: index + 1 }, () => item));
+  }, []);
 }
 
 /**
